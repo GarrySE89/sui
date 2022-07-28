@@ -125,6 +125,7 @@ where
             ));
             self.net.store(new_net);
         }
+
         // TODO: Update all committee in all components safely,
         // potentially restart narwhal committee/consensus adapter,
         // all active processes, maybe batch service.
@@ -148,6 +149,7 @@ where
 
         // Collect a certificate for this system transaction that changes epoch,
         // and execute it locally.
+        let mut cnt = 0;
         loop {
             let err = match self
                 .net
@@ -168,6 +170,8 @@ where
                 "Error when processing advance epoch transaction: {:?}", err
             );
             tokio::time::sleep(WAIT_BETWEEN_EPOCH_TX_QUERY_RETRY).await;
+            cnt += 1;
+            assert!(cnt <= 50);
         }
 
         // Resume the validator to start accepting transactions for the new epoch.
